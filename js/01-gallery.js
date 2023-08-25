@@ -5,6 +5,8 @@ listGalleryEl.addEventListener("click", onClickAtPicture);
 
 setGalleryToListHTML(`beforeend`, createGalleryMarkup(galleryItems));
 
+let keydownHandler = null;
+
 function onClickAtPicture(e) {
   e.preventDefault();
   if (e.target.nodeName !== "IMG") {
@@ -12,17 +14,28 @@ function onClickAtPicture(e) {
   }
   showBigImg(e.target);
 }
+
 function showBigImg(target) {
   const instance = basicLightbox.create(
     `<img src="${target.dataset.source}" width="800" height="600">`
   );
   instance.show();
 
-  listGalleryEl.addEventListener("keydown", (evt) => {
+  keydownHandler = (evt) => {
     if (evt.code === "Escape") {
       instance.close();
+      removeKeydownListener();
     }
-  });
+  };
+
+  listGalleryEl.addEventListener("keydown", keydownHandler);
+}
+
+function removeKeydownListener() {
+  if (keydownHandler) {
+    listGalleryEl.removeEventListener("keydown", keydownHandler);
+    keydownHandler = null;
+  }
 }
 
 function createGalleryMarkup(galleryItems) {
